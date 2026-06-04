@@ -21,6 +21,73 @@
     --gold: #e8b84b;
   }
 
+
+  /* ══ MODAL MODIFICATION ══ */
+  .modal-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal-edit-grid .field { margin-bottom: 8px; }
+  .field-full { grid-column: 1 / -1; }
+
+  /* PHOTO LICENCIÉ */
+  .photo-upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: border 0.2s;
+    background: var(--surface2);
+    position: relative;
+  }
+  .photo-upload-zone:hover { border-color: var(--accent2); }
+  .photo-upload-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .photo-preview {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent);
+    display: none;
+    margin: 0 auto 8px;
+  }
+  .photo-preview.show { display: block; }
+  .photo-placeholder { font-size: 2rem; margin-bottom: 4px; }
+  .photo-label { font-size: 0.72rem; color: var(--muted); }
+
+  /* PHOTO DANS TABLE */
+  .lic-photo {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    vertical-align: middle;
+  }
+  .lic-photo-placeholder {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    vertical-align: middle;
+  }
+
+  /* BADGE MODIFIÉ PAR */
+  .modif-badge {
+    font-size: 0.68rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+  }
+  .modif-badge .modif-who {
+    color: var(--accent2);
+    font-weight: 600;
+  }
+
   /* ══ LOGIN ══ */
   #login-screen {
     position: fixed; inset: 0;
@@ -560,6 +627,7 @@ function doLogout() {
         <thead>
           <tr>
             <th>#</th>
+            <th>Photo</th>
             <th>Nom / Prénom</th>
             <th>Catégorie</th>
             <th>Saison</th>
@@ -569,6 +637,7 @@ function doLogout() {
             <th>Mode</th>
             <th>Équipement</th>
             <th>Statut</th>
+            <th>Modifié par</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -580,6 +649,105 @@ function doLogout() {
     </div>
   </div>
 </main>
+
+
+<!-- MODAL MODIFICATION -->
+<div class="modal-bg" id="modal-edit">
+  <div class="modal" style="max-width:560px">
+    <button class="modal-close" onclick="closeModal('modal-edit')">✕</button>
+    <div class="modal-title">✏️ Modifier la fiche licencié</div>
+
+    <!-- PHOTO -->
+    <div class="field" style="margin-bottom:16px">
+      <label>Photo du licencié</label>
+      <div class="photo-upload-zone" onclick="document.getElementById('edit-photo-input').click()">
+        <input type="file" id="edit-photo-input" accept="image/*" onchange="previewEditPhoto(event)">
+        <img id="edit-photo-preview" class="photo-preview" src="" alt="photo">
+        <div id="edit-photo-placeholder">
+          <div class="photo-placeholder">📷</div>
+          <div class="photo-label">Cliquer pour choisir une photo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-edit-grid">
+      <div class="field">
+        <label>Nom</label>
+        <input type="text" id="edit-nom" placeholder="Dupont">
+      </div>
+      <div class="field">
+        <label>Prénom</label>
+        <input type="text" id="edit-prenom" placeholder="Jean">
+      </div>
+      <div class="field">
+        <label>Date de naissance</label>
+        <input type="date" id="edit-dob">
+      </div>
+      <div class="field">
+        <label>Catégorie</label>
+        <select id="edit-cat">
+          <option value="Baby Foot">Baby Foot — 150 €</option>
+          <option value="Sport">Autre catégorie — 230 €</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Nb enfants dans le club</label>
+        <input type="number" id="edit-enfants" min="0" max="10" value="0">
+      </div>
+      <div class="field">
+        <label>Saison</label>
+        <select id="edit-saison">
+          <option value="2025-2026">2025 / 2026</option>
+          <option value="2026-2027">2026 / 2027</option>
+          <option value="2027-2028">2027 / 2028</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Équipement</label>
+        <select id="edit-equipement">
+          <option value="">— Aucun —</option>
+          <option value="Pack Joueur Enfant">🎽 Pack Joueur Enfant</option>
+          <option value="Pack Joueur Adulte">🎽 Pack Joueur Adulte</option>
+          <option value="Pack Entraîneur">🦺 Pack Entraîneur</option>
+          <option value="Pack Dirigeant">📋 Pack Dirigeant</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Mode de paiement</label>
+        <select id="edit-paiement">
+          <option value="SportyNeo">SportyNeo</option>
+          <option value="CB">Carte Bancaire</option>
+          <option value="Chèque">Chèque</option>
+          <option value="Espèces">Espèces</option>
+          <option value="Virement">Virement</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Montant versé (€)</label>
+        <input type="number" id="edit-verse" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label>Statut</label>
+        <select id="edit-statut">
+          <option value="impaye">❌ Impayé</option>
+          <option value="partiel">⏳ Partiel</option>
+          <option value="valide">✅ Validé</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- RECAP -->
+    <div class="cotis-box" style="margin-top:10px">
+      <div class="cotis-row"><span>Total cotisation</span><span class="val" id="edit-total-display">–</span></div>
+      <div class="cotis-row"><span>Versé</span><span class="val" style="color:var(--green)" id="edit-verse-display">–</span></div>
+      <div class="cotis-row total"><span>Reste à payer</span><span class="val" id="edit-reste-display">–</span></div>
+    </div>
+
+    <input type="hidden" id="edit-id">
+    <button class="btn btn-primary" style="margin-top:14px" onclick="saveEdit()">💾 Enregistrer les modifications</button>
+    <button class="btn btn-secondary" onclick="closeModal('modal-edit')">Annuler</button>
+  </div>
+</div>
 
 <!-- MODAL REÇU -->
 <div class="modal-bg" id="modal-recu">
@@ -752,6 +920,130 @@ function resetForm() {
   updatePreview();
 }
 
+
+// ══ MODIFICATION FICHE ══
+let editPhotoBase64 = null;
+
+function openEditModal(id) {
+  const l = licencies.find(x => x.id === id);
+  if (!l) return;
+
+  document.getElementById('edit-id').value = l.id;
+  document.getElementById('edit-nom').value = l.nom;
+  document.getElementById('edit-prenom').value = l.prenom;
+  document.getElementById('edit-dob').value = l.dob || '';
+  document.getElementById('edit-cat').value = l.cat;
+  document.getElementById('edit-enfants').value = l.nbEnfants || 0;
+  document.getElementById('edit-saison').value = l.saison || '2025-2026';
+  document.getElementById('edit-equipement').value = l.equipement || '';
+  document.getElementById('edit-paiement').value = l.paiement || 'Espèces';
+  document.getElementById('edit-verse').value = Number(l.verse).toFixed(2);
+  document.getElementById('edit-statut').value = l.statut || 'impaye';
+
+  // Photo
+  editPhotoBase64 = l.photo || null;
+  const prev = document.getElementById('edit-photo-preview');
+  const plac = document.getElementById('edit-photo-placeholder');
+  if (editPhotoBase64) {
+    prev.src = editPhotoBase64;
+    prev.classList.add('show');
+    plac.style.display = 'none';
+  } else {
+    prev.classList.remove('show');
+    plac.style.display = 'block';
+  }
+
+  updateEditRecap();
+  document.getElementById('modal-edit').classList.add('open');
+}
+
+function previewEditPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    // Redimensionner
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const size = 200;
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const min = Math.min(img.width, img.height);
+      const sx = (img.width - min) / 2;
+      const sy = (img.height - min) / 2;
+      ctx.drawImage(img, sx, sy, min, min, 0, 0, size, size);
+      editPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      document.getElementById('edit-photo-preview').src = editPhotoBase64;
+      document.getElementById('edit-photo-preview').classList.add('show');
+      document.getElementById('edit-photo-placeholder').style.display = 'none';
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateEditRecap() {
+  const cat = document.getElementById('edit-cat').value;
+  const nb = parseInt(document.getElementById('edit-enfants').value) || 0;
+  const { total } = calcCotisation(cat, nb);
+  const verse = parseFloat(document.getElementById('edit-verse').value) || 0;
+  const reste = Math.max(0, total - verse);
+  document.getElementById('edit-total-display').textContent = total.toFixed(2) + ' €';
+  document.getElementById('edit-verse-display').textContent = verse.toFixed(2) + ' €';
+  const resteEl = document.getElementById('edit-reste-display');
+  resteEl.textContent = reste > 0 ? reste.toFixed(2) + ' €' : '✔ Soldé';
+  resteEl.style.color = reste > 0 ? 'var(--orange)' : 'var(--green)';
+}
+
+['edit-cat','edit-enfants','edit-verse'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateEditRecap);
+  document.getElementById(id).addEventListener('change', updateEditRecap);
+});
+
+async function saveEdit() {
+  const id = document.getElementById('edit-id').value;
+  const nom = document.getElementById('edit-nom').value.trim();
+  const prenom = document.getElementById('edit-prenom').value.trim();
+  if (!nom || !prenom) { showToast('⚠️ Saisissez le nom et le prénom', 'error'); return; }
+
+  const cat = document.getElementById('edit-cat').value;
+  const nbEnfants = parseInt(document.getElementById('edit-enfants').value) || 0;
+  const dob = document.getElementById('edit-dob').value;
+  const saison = document.getElementById('edit-saison').value;
+  const equipement = document.getElementById('edit-equipement').value;
+  const paiement = document.getElementById('edit-paiement').value;
+  const verse = parseFloat(document.getElementById('edit-verse').value) || 0;
+  const statut = document.getElementById('edit-statut').value;
+  const { base, remise, total } = calcCotisation(cat, nbEnfants);
+  const reste = Math.max(0, total - verse);
+
+  const connectedUser = sessionStorage.getItem('fcpl_user') || 'Inconnu';
+  const modifDate = new Date().toLocaleDateString('fr-FR') + ' ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+  const modifPar = connectedUser.charAt(0) + connectedUser.slice(1).toLowerCase() + ' · ' + modifDate;
+
+  const updated = {
+    id, nom, prenom, dob, cat, nbEnfants, base, remise, total,
+    verse, reste, paiement, equipement, saison, statut,
+    photo: editPhotoBase64 || '',
+    modifPar
+  };
+
+  closeModal('modal-edit');
+  showLoader('Mise à jour de la fiche…');
+
+  try {
+    await apiCall({ action: 'updateFiche', ...updated });
+    const idx = licencies.findIndex(x => x.id === id);
+    if (idx !== -1) licencies[idx] = { ...licencies[idx], ...updated };
+    renderTable(); updateStats();
+    setSyncState('ok', 'Fiche modifiée · ' + new Date().toLocaleTimeString('fr-FR'));
+    showToast('✅ Fiche mise à jour par ' + (connectedUser.charAt(0) + connectedUser.slice(1).toLowerCase()) + ' !');
+  } catch(err) {
+    showToast('❌ Erreur de mise à jour', 'error');
+  } finally { hideLoader(); }
+}
+
 // ══ PAIEMENT COMPLÉMENTAIRE ══
 function openPayModal(id) {
   const l = licencies.find(x => x.id === id);
@@ -884,7 +1176,11 @@ function renderTable() {
     const canPay = l.statut !== 'valide';
     return `<tr>
       <td class="mono">${i+1}</td>
-      <td><strong>${l.nom.toUpperCase()}</strong> ${l.prenom}</td>
+      <td>${l.photo ? `<img class="lic-photo" src="${l.photo}" alt="">` : '<div class="lic-photo-placeholder">👤</div>'}</td>
+      <td>
+        <strong>${l.nom.toUpperCase()}</strong> ${l.prenom}
+        ${l.modifPar ? `<div class="modif-badge">✏️ <span class="modif-who">${l.modifPar.split(' · ')[0]}</span> · ${l.modifPar.split(' · ')[1]||''}</div>` : ''}
+      </td>
       <td><span class="badge ${l.cat==='Baby Foot'?'badge-baby':'badge-sport'}">${l.cat}</span></td>
       <td class="mono">${l.saison}</td>
       <td class="mono">${total.toFixed(2)} €</td>
@@ -893,8 +1189,10 @@ function renderTable() {
       <td style="font-size:0.78rem;color:var(--muted)">${l.paiement||'–'}</td>
       <td>${l.equipement ? `<span style="background:#1a2a1a;color:#4fd67a;border-radius:10px;padding:2px 8px;font-size:0.7rem;font-weight:600">${l.equipement}</span>` : '<span style="color:var(--muted);font-size:0.78rem">–</span>'}</td>
       <td><span class="badge ${badges[l.statut]||'badge-unpaid'}">${labels[l.statut]||'–'}</span></td>
+      <td style="font-size:0.72rem;color:var(--muted)">${l.modifPar ? l.modifPar : '–'}</td>
       <td><div class="action-btns">
         ${canPay ? `<button class="icon-btn partial" onclick="openPayModal('${l.id}')">💰 Payer</button>` : ''}
+        <button class="icon-btn" style="color:var(--accent2)" onclick="openEditModal('${l.id}')">✏️ Modifier</button>
         <button class="icon-btn" onclick="viewReceipt('${l.id}')">🧾</button>
         <button class="icon-btn del" onclick="deleteLicencie('${l.id}')">🗑</button>
       </div></td>
@@ -931,7 +1229,7 @@ async function loadData() {
       ...l,
       nbEnfants: Number(l.nbEnfants), base: Number(l.base), remise: Number(l.remise),
       total: Number(l.total), verse: Number(l.verse||0), reste: Number(l.reste||0),
-      equipement: l.equipement||'', id: String(l.id)
+      equipement: l.equipement||'', photo: l.photo||'', modifPar: l.modifPar||'', id: String(l.id)
     }));
     renderTable(); updateStats();
     setSyncState('ok', 'Synchronisé · ' + new Date().toLocaleTimeString('fr-FR'));
