@@ -132,7 +132,77 @@
     margin-left: 8px;
     text-decoration: underline;
   }
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzFyWxR7XpcpSLthTZmoXedlF4XSl6l5s-0IjJe9OJ8-6nRa66C2LMcqB0-a3y0KYGJ9g/exec";
 
+/* Toujours demander une connexion */
+window.onload = function() {
+  sessionStorage.removeItem("fcpl_user");
+  document.getElementById("login-screen").style.display = "flex";
+  document.getElementById("app-container").style.display = "none";
+};
+
+async function doLogin() {
+
+  const user = document.getElementById("login-user").value;
+  const code = document.getElementById("login-code").value;
+  const err = document.getElementById("login-error");
+
+  err.textContent = "";
+
+  try {
+
+    const response = await fetch(SHEET_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "login",
+        user: user,
+        code: code
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.status === "ok") {
+
+      sessionStorage.setItem("fcpl_user", result.user);
+
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("app-container").style.display = "block";
+
+      document.getElementById("user-badge").style.display = "block";
+      document.getElementById("badge-name").textContent = result.user;
+
+    } else {
+
+      err.textContent = "❌ " + result.message;
+      err.classList.add("show");
+
+    }
+
+  } catch (e) {
+
+    err.textContent = "❌ Erreur de connexion au serveur";
+    err.classList.add("show");
+    console.error(e);
+
+  }
+}
+
+function doLogout() {
+
+  sessionStorage.removeItem("fcpl_user");
+
+  document.getElementById("login-screen").style.display = "flex";
+  document.getElementById("app-container").style.display = "none";
+
+  document.getElementById("login-code").value = "";
+
+}
+</script>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
 
